@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using OpenFaceApi.Builder;
+using OpenFaceApi.DTO;
 
 namespace OpenFaceApi.Controllers
 {
@@ -10,37 +9,38 @@ namespace OpenFaceApi.Controllers
     [ApiController]
     public class OpenFaceController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get(string images)
-        {
-            var result = new List<string> {$"Scanning for images in images/examples/{images}"};
+        private readonly IFaceComparisonCollectionBuilder _faceComparisonCollectionBuilder;
 
+        public OpenFaceController(IFaceComparisonCollectionBuilder faceComparisonCollectionBuilder)
+        {
+            _faceComparisonCollectionBuilder = faceComparisonCollectionBuilder;
+        }
+
+        [HttpGet]
+        public ActionResult<FaceComparisonResponse> Get(string searchTerm)
+        {
             var process = new Process();
             var startinfo = new ProcessStartInfo("run_openface.bat")
             {
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                Arguments = images
+                Arguments = searchTerm
             };
 
             process.StartInfo = startinfo;
-            
+
             process.Start();
             process.WaitForExit();
 
             var outputText = process.StandardOutput.ReadToEnd();
-            var outputLines = SplitActualOutputLines(outputText);
-
-            result.AddRange(outputLines);
+            var result = new FaceComparisonResponse
+            {
+                SearchTerm = $"Scanning for images in images/examples/{searchTerm}",
+                FaceComparisons = _faceComparisonCollectionBuilder.Build(outputText)
+            };
 
             return result;
-        }
-
-        private static IEnumerable<string> SplitActualOutputLines(string text)
-        {
-            return text.Split(Environment.NewLine)
-                .Where(line => line != string.Empty && !line.StartsWith(@"C:\"));
         }
     }
 }

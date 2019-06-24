@@ -1,0 +1,35 @@
+{
+	"info": {
+		"_postman_id": "1fd09f58-587f-48a0-9e6a-ffab05545030",
+		"name": "OpenFaceApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OpenFace",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44369/api/openface?searchTerm=jon-*",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44369",
+					"path": [
+						"api",
+						"openface"
+					],
+					"query": [
+						{
+							"key": "searchTerm",
+							"value": "jon-*"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
